@@ -57,6 +57,37 @@ const RanksPage = () => {
     toast({ title: "Rank Created", description: `"${newRank.name}" has been added.` });
   };
 
+  const openEdit = (rank: RankConfig) => {
+    setEditingRank(rank);
+    setForm({
+      name: rank.name,
+      requiredPoints: rank.requiredPoints,
+      requiredReferrals: rank.requiredReferrals,
+      rewardAmount: rank.rewardAmount,
+      bonusPercentage: rank.bonusPercentage,
+      color: rank.color,
+    });
+    setEditOpen(true);
+  };
+
+  const handleEdit = () => {
+    if (!editingRank || !form.name.trim()) {
+      toast({ title: "Validation Error", description: "Rank name is required.", variant: "destructive" });
+      return;
+    }
+    setRanks((prev) =>
+      prev.map((r) =>
+        r.id === editingRank.id
+          ? { ...r, name: form.name, requiredPoints: form.requiredPoints, requiredReferrals: form.requiredReferrals, rewardAmount: form.rewardAmount, bonusPercentage: form.bonusPercentage, color: form.color }
+          : r
+      )
+    );
+    toast({ title: "Rank Updated", description: `"${form.name}" has been updated.` });
+    setEditOpen(false);
+    setEditingRank(null);
+    setForm(defaultForm);
+  };
+
   const handleDelete = (id: string) => {
     const rank = ranks.find((r) => r.id === id);
     setRanks((prev) => prev.filter((r) => r.id !== id));
