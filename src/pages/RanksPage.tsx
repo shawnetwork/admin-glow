@@ -223,7 +223,7 @@ const RanksPage = () => {
               </div>
 
               <div className="flex gap-2 pt-1">
-                <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+                <button onClick={() => openEdit(rank)} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
                   <Edit className="h-3.5 w-3.5" /> Edit
                 </button>
                 <AlertDialog>
