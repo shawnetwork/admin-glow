@@ -28,6 +28,8 @@ const colorPresets = [
 const RanksPage = () => {
   const [ranks, setRanks] = useState<RankConfig[]>(ranksData);
   const [createOpen, setCreateOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingRank, setEditingRank] = useState<RankConfig | null>(null);
   const [form, setForm] = useState(defaultForm);
 
   const toggleRank = (id: string) => {
@@ -53,6 +55,37 @@ const RanksPage = () => {
     setForm(defaultForm);
     setCreateOpen(false);
     toast({ title: "Rank Created", description: `"${newRank.name}" has been added.` });
+  };
+
+  const openEdit = (rank: RankConfig) => {
+    setEditingRank(rank);
+    setForm({
+      name: rank.name,
+      requiredPoints: rank.requiredPoints,
+      requiredReferrals: rank.requiredReferrals,
+      rewardAmount: rank.rewardAmount,
+      bonusPercentage: rank.bonusPercentage,
+      color: rank.color,
+    });
+    setEditOpen(true);
+  };
+
+  const handleEdit = () => {
+    if (!editingRank || !form.name.trim()) {
+      toast({ title: "Validation Error", description: "Rank name is required.", variant: "destructive" });
+      return;
+    }
+    setRanks((prev) =>
+      prev.map((r) =>
+        r.id === editingRank.id
+          ? { ...r, name: form.name, requiredPoints: form.requiredPoints, requiredReferrals: form.requiredReferrals, rewardAmount: form.rewardAmount, bonusPercentage: form.bonusPercentage, color: form.color }
+          : r
+      )
+    );
+    toast({ title: "Rank Updated", description: `"${form.name}" has been updated.` });
+    setEditOpen(false);
+    setEditingRank(null);
+    setForm(defaultForm);
   };
 
   const handleDelete = (id: string) => {
@@ -190,7 +223,7 @@ const RanksPage = () => {
               </div>
 
               <div className="flex gap-2 pt-1">
-                <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+                <button onClick={() => openEdit(rank)} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
                   <Edit className="h-3.5 w-3.5" /> Edit
                 </button>
                 <AlertDialog>
@@ -218,6 +251,58 @@ const RanksPage = () => {
             </motion.div>
           ))}
         </div>
+
+        <Dialog open={editOpen} onOpenChange={(open) => { setEditOpen(open); if (!open) { setEditingRank(null); setForm(defaultForm); } }}>
+          <DialogContent className="glass-card-glow sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Rank</DialogTitle>
+              <DialogDescription>Update the details for "{editingRank?.name}".</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-name">Rank Name</Label>
+                <Input id="edit-name" placeholder="e.g. Emerald" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-points">Required Points</Label>
+                  <Input id="edit-points" type="number" min={0} value={form.requiredPoints} onChange={(e) => setForm({ ...form, requiredPoints: +e.target.value })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-referrals">Required Referrals</Label>
+                  <Input id="edit-referrals" type="number" min={0} value={form.requiredReferrals} onChange={(e) => setForm({ ...form, requiredReferrals: +e.target.value })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-reward">Reward Amount (Rs)</Label>
+                  <Input id="edit-reward" type="number" min={0} value={form.rewardAmount} onChange={(e) => setForm({ ...form, rewardAmount: +e.target.value })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-bonus">Bonus %</Label>
+                  <Input id="edit-bonus" type="number" min={0} max={100} value={form.bonusPercentage} onChange={(e) => setForm({ ...form, bonusPercentage: +e.target.value })} />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Rank Color</Label>
+                <div className="flex gap-2 flex-wrap">
+                  {colorPresets.map((c) => (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setForm({ ...form, color: c.value })}
+                      className={`h-8 w-8 rounded-full border-2 transition-all ${form.color === c.value ? "border-foreground scale-110" : "border-transparent"}`}
+                      style={{ background: `hsl(${c.value})` }}
+                      title={c.label}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <button onClick={() => { setEditOpen(false); setEditingRank(null); setForm(defaultForm); }} className="px-4 py-2 text-sm rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">Cancel</button>
+              <button onClick={handleEdit} className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">Save Changes</button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
