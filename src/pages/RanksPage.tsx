@@ -28,6 +28,8 @@ const colorPresets = [
 const RanksPage = () => {
   const [ranks, setRanks] = useState<RankConfig[]>(ranksData);
   const [createOpen, setCreateOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingRank, setEditingRank] = useState<RankConfig | null>(null);
   const [form, setForm] = useState(defaultForm);
 
   const toggleRank = (id: string) => {
