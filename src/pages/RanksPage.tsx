@@ -251,6 +251,58 @@ const RanksPage = () => {
             </motion.div>
           ))}
         </div>
+
+        <Dialog open={editOpen} onOpenChange={(open) => { setEditOpen(open); if (!open) { setEditingRank(null); setForm(defaultForm); } }}>
+          <DialogContent className="glass-card-glow sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Rank</DialogTitle>
+              <DialogDescription>Update the details for "{editingRank?.name}".</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-name">Rank Name</Label>
+                <Input id="edit-name" placeholder="e.g. Emerald" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-points">Required Points</Label>
+                  <Input id="edit-points" type="number" min={0} value={form.requiredPoints} onChange={(e) => setForm({ ...form, requiredPoints: +e.target.value })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-referrals">Required Referrals</Label>
+                  <Input id="edit-referrals" type="number" min={0} value={form.requiredReferrals} onChange={(e) => setForm({ ...form, requiredReferrals: +e.target.value })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-reward">Reward Amount (Rs)</Label>
+                  <Input id="edit-reward" type="number" min={0} value={form.rewardAmount} onChange={(e) => setForm({ ...form, rewardAmount: +e.target.value })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-bonus">Bonus %</Label>
+                  <Input id="edit-bonus" type="number" min={0} max={100} value={form.bonusPercentage} onChange={(e) => setForm({ ...form, bonusPercentage: +e.target.value })} />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Rank Color</Label>
+                <div className="flex gap-2 flex-wrap">
+                  {colorPresets.map((c) => (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setForm({ ...form, color: c.value })}
+                      className={`h-8 w-8 rounded-full border-2 transition-all ${form.color === c.value ? "border-foreground scale-110" : "border-transparent"}`}
+                      style={{ background: `hsl(${c.value})` }}
+                      title={c.label}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <button onClick={() => { setEditOpen(false); setEditingRank(null); setForm(defaultForm); }} className="px-4 py-2 text-sm rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">Cancel</button>
+              <button onClick={handleEdit} className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">Save Changes</button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
